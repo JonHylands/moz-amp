@@ -70,7 +70,8 @@ def ProcessPacketFromSerial(serialPort):
 
 print 'MozAmpTest'
 
-serialPort = serial.Serial(port='/dev/ttyACM0', baudrate=1000000, timeout=1)
+# serialPort = serial.Serial(port='/dev/ttyACM0', baudrate=1000000, timeout=1)
+serialPort = serial.Serial(port='COM7', baudrate=1000000, timeout=1)
 
 # commandBytes = bytearray.fromhex("ff ff 01 02 01 FB") #SET_ID
 # commandBytes = bytearray.fromhex("ff ff 01 02 02 FA") #START_ASYNC
@@ -80,16 +81,17 @@ serialPort = serial.Serial(port='/dev/ttyACM0', baudrate=1000000, timeout=1)
 commandBytes = bytearray.fromhex("ff ff 01 02 07 F5") #SEND_SAMPLE
 
 serialPort.flushInput()
-serialPort.write(commandBytes)
-serialPort.flush()
 
-bytes = serialPort.read(14)
+for index in range(0, 100):
+	serialPort.write(commandBytes)
+	serialPort.flush()
+	bytes = serialPort.read(14)
+	ProcessPacket(bytes)
 
-f = open('data.txt', 'wb')
-f.write(bytes)
-f.close()
+#f = open('data.txt', 'wb')
+#f.write(bytes)
+#f.close()
 
-ProcessPacket(bytes)
 
 # ProcessPacketFromSerial(serialPort)
 

@@ -125,9 +125,13 @@ class CurrentModule:
 		
 
 	def startRunning(self):
-		self.serialPort = serial.Serial(port='/dev/ttyACM0', baudrate=1000000, timeout=1)
+		if (self.serialPort is None) or (self.serialPort.isOpen() == False):
+			self.serialPort = serial.Serial(port='COM7', baudrate=1000000, timeout=1)
+#		self.serialPort = serial.Serial(port='/dev/ttyACM0', baudrate=1000000, timeout=1)
 #		commandBytes = bytearray.fromhex("ff ff 01 02 02 FA") #START_ASYNC
+		commandBytes = bytearray.fromhex("ff ff 01 02 05 F7") #TURN_OFF_BATTERY
+		commandBytes = bytearray.fromhex("ff ff 01 02 06 F6") #TURN_ON_BATTERY
 		self.serialPort.flushInput()
-#		self.serialPort.write(commandBytes)
+		self.serialPort.write(commandBytes)
 		self.serialPort.flush()
 		self.startMillis = unix_time_millis(dt.datetime.utcnow())
