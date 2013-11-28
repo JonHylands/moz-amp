@@ -17,7 +17,7 @@ BOTTOM_SIDE = 800
 ZERO_LINE = BOTTOM_SIDE / 2
 SCALE_FACTOR = 2
 FRAMERATE = 25
-FRAME_DELAY = 1000 / FRAMERATE
+FRAME_DELAY = (1000 / FRAMERATE) - 5  # allow for loop overhead & window redraw
 
 STOP_PAUSE = FRAME_DELAY * 2
 QUIT_PAUSE = FRAME_DELAY * 3
@@ -44,16 +44,24 @@ class SampleDisplayer:
 		self.canvasScroll.config(command=self.mainCanvas.xview)
 		self.mainCanvas.config(scrollregion=(0, 0, 0, BOTTOM_SIDE))
 
-		BUTTON_COUNT = 2
+		BUTTON_COUNT = 5
 		LINE_COUNT = (BOTTOM_SIDE / 16) - (BUTTON_COUNT * 2)
 		self.frameWidget = Frame(self.master)
 		self.frameWidget.pack(side=LEFT, anchor=NW)
+		self.voltageString = StringVar()
+		self.voltageString.set("Voltage\n0.00 V")
+		self.voltageWidget = Label(self.frameWidget, textvariable=self.voltageString)
+		self.voltageWidget.pack(side=TOP)
 		self.logWidget = Listbox(self.frameWidget, width=10, height=LINE_COUNT)
 		self.logWidget.pack(side=TOP)
 		self.startButton = Button(self.frameWidget, text="Start", command=self.startRunning)
 		self.startButton.pack(side=TOP, fill=X)
 		self.stopButton = Button(self.frameWidget, text="Stop", command=self.stopRunning)
 		self.stopButton.pack(side=TOP, fill=X)
+		self.connectBatteryButton = Button(self.frameWidget, text="Connect", command=self.connectBattery)
+		self.connectBatteryButton.pack(side=TOP, fill=X)
+		self.disconnectBatteryButton = Button(self.frameWidget, text="Disconnect", command=self.disconnectBattery)
+		self.disconnectBatteryButton.pack(side=TOP, fill=X)
 
 		self.drawScaleCanvas()
 		self.drawInitialMainCanvas()
@@ -72,8 +80,15 @@ class SampleDisplayer:
 		self.mainCanvas.after(QUIT_PAUSE, self.quit)
 
 	def quit(self):
+		self.module.stopRunning()
 		self.master.destroy()
 		self.master.quit()
+
+	def connectBattery(self):
+		self.module.connectBattery()
+
+	def disconnectBattery(self):
+		self.module.disconnectBattery()
 
 	def drawCurrentLine(self):
 		startTime = unix_time_millis(dt.datetime.utcnow())
@@ -105,8 +120,12 @@ class SampleDisplayer:
 #				print 'Unrecoverable sync error'
 #				return
 
+		millivolts = sample.getVoltage()
+		voltage = millivolts / 1000.0
+		voltageString = "Voltage\n{:3.2f} V".format(voltage)
+		self.voltageString.set(voltageString)
 		self.samples.append(sample)
-		current = sample.getCurrent()
+		current = sample.getCurrent() / 10.0
 		newYPosition = ZERO_LINE - (current / SCALE_FACTOR)
 
 		# log the current sample
@@ -135,7 +154,7 @@ class SampleDisplayer:
 			xPos = self.xPosition
 			if xPos == 0:
 				xPos = 5
-			# we have this nonesense with lastLine so the last seconds text label will be above the next line
+			# we have this nonsense with lastLine so the last seconds text label will be above the next line
 			self.mainCanvas.create_text(xPos, BOTTOM_SIDE - 10, text=label, fill="blue")
 
 		# draw the current line(s)
@@ -158,7 +177,7 @@ class SampleDisplayer:
 		self.yPosition = newYPosition
 		self.previousCurrent = current
 		drawTime = int(unix_time_millis(dt.datetime.utcnow()) - startTime)
-		waitTime = max(FRAME_DELAY - drawTime, 5)
+		waitTime = max(FRAME_DELAY - drawTime, 1)
 		if self.running:
 			self.mainCanvas.after(waitTime, self.drawCurrentLine)
 
@@ -182,12 +201,12 @@ class SampleDisplayer:
 
 	def startRunning(self):
 		self.running = True
-		self.module.startRunning()
+		# self.module.startRunning()
 		self.drawCurrentLine()
 
 	def stopRunning(self):
 		# make sure the last drawCurrentLine event happens before we kill the serial port
-		self.mainCanvas.after(STOP_PAUSE, self.stopModule)
+		# self.mainCanvas.after(STOP_PAUSE, self.stopModule)
 		self.running = False
 
 	def stopModule(self):

@@ -11,11 +11,17 @@ os.chdir(currentPath)
 
 from Tkinter import *
 
+
 def ProcessPacket(packetBytes):
 	packetLength = len(packetBytes)
 #	if packetLength != 86:
 #		print 'Packet is not 86 bytes long - {} bytes'.format(packetLength)
 #		return
+
+	global PacketCount
+	global CurrentTotal
+	global MinCurrent
+	global MaxCurrent
 
 	dataPortion = packetBytes[5:packetLength-1]
 	dataCount = len(dataPortion) / 8
@@ -30,6 +36,12 @@ def ProcessPacket(packetBytes):
 		msCounter = ord(sampleBytes[4]) + (ord(sampleBytes[5]) * 256) + (ord(sampleBytes[6]) * 65536) + (ord(sampleBytes[7]) * 16777216)
 		print 'Sample %(index)d  - current: %(current)d voltage: %(voltage)d msCounter: %(counter)d' \
 			% {"index": index, "current": current, "voltage": voltage, "counter": msCounter}
+		PacketCount = PacketCount + 1
+		CurrentTotal = CurrentTotal + current
+		if current < MinCurrent:
+			MinCurrent = current
+		if current > MaxCurrent:
+			MaxCurrent = current
 
 def ProcessPacketFromSerial(serialPort):
 	header = ord(serialPort.read(1))
@@ -82,11 +94,23 @@ commandBytes = bytearray.fromhex("ff ff 01 02 07 F5") #SEND_SAMPLE
 
 serialPort.flushInput()
 
+PacketCount = 0
+CurrentTotal = 0
+MinCurrent = 65536
+MaxCurrent = -65536
+
 for index in range(0, 100):
 	serialPort.write(commandBytes)
 	serialPort.flush()
 	bytes = serialPort.read(14)
 	ProcessPacket(bytes)
+
+average = CurrentTotal / PacketCount
+print ''
+print 'Average: %(average)d' % {"average": average}
+print 'Min:     %(min)d' % {"min": MinCurrent}
+print 'Max:     %(max)d' % {"max": MaxCurrent}
+
 
 #f = open('data.txt', 'wb')
 #f.write(bytes)

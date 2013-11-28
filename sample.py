@@ -112,6 +112,15 @@ class CurrentModule:
 		self.serialPort.read(index)
 		return True
 
+	def connectBattery(self):
+		commandBytes = bytearray.fromhex("ff ff 01 02 06 F6") #TURN_ON_BATTERY
+		self.serialPort.write(commandBytes)
+		self.serialPort.flush()
+
+	def disconnectBattery(self):
+		commandBytes = bytearray.fromhex("ff ff 01 02 05 F7") #TURN_OFF_BATTERY
+		self.serialPort.write(commandBytes)
+		self.serialPort.flush()
 
 	def stopRunning(self):
 #		commandBytes = bytearray.fromhex("ff ff 01 02 03 F9") #STOP_ASYNC
