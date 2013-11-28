@@ -4,6 +4,8 @@ import os,sys
 import datetime as dt
 import time
 import serial
+from serial.tools import list_ports
+import platform
 
 SAMPLE_COUNT_PER_PACKET = 1
 PACKET_SIZE = (SAMPLE_COUNT_PER_PACKET * 8) + 6
@@ -74,7 +76,6 @@ class CurrentModule:
 	def __init__(self):
 		self.serialPort = None
 		self.startMillis = None
-		self.startRunning()
 
 	def getSample(self):
 		if self.serialPort.isOpen():
@@ -112,6 +113,21 @@ class CurrentModule:
 		self.serialPort.read(index)
 		return True
 
+	def serialPortList(self):
+		if platform.system() == "Windows":
+			# windows
+			for i in range(256):
+					try:
+							s = serial.Serial(i)
+							s.close()
+							yield 'COM' + str(i + 1)
+					except serial.SerialException:
+							pass
+    else:
+        # unix/linux/mac
+        for port in list_ports.comports():
+            yield port[0]
+
 	def connectBattery(self):
 		commandBytes = bytearray.fromhex("ff ff 01 02 06 F6") #TURN_ON_BATTERY
 		self.serialPort.write(commandBytes)
@@ -133,14 +149,14 @@ class CurrentModule:
 		self.serialPort.close()
 		
 
-	def startRunning(self):
+	def startRunning(self, portName):
 		if (self.serialPort is None) or (self.serialPort.isOpen() == False):
-			self.serialPort = serial.Serial(port='COM7', baudrate=1000000, timeout=1)
-#		self.serialPort = serial.Serial(port='/dev/ttyACM0', baudrate=1000000, timeout=1)
+			self.serialPort = serial.Serial(port=portName, baudrate=1000000, timeout=1)
+
 #		commandBytes = bytearray.fromhex("ff ff 01 02 02 FA") #START_ASYNC
-		commandBytes = bytearray.fromhex("ff ff 01 02 05 F7") #TURN_OFF_BATTERY
-		commandBytes = bytearray.fromhex("ff ff 01 02 06 F6") #TURN_ON_BATTERY
-		self.serialPort.flushInput()
-		self.serialPort.write(commandBytes)
-		self.serialPort.flush()
+#		commandBytes = bytearray.fromhex("ff ff 01 02 05 F7") #TURN_OFF_BATTERY
+#		commandBytes = bytearray.fromhex("ff ff 01 02 06 F6") #TURN_ON_BATTERY
+#		self.serialPort.flushInput()
+#		self.serialPort.write(commandBytes)
+#		self.serialPort.flush()
 		self.startMillis = unix_time_millis(dt.datetime.utcnow())

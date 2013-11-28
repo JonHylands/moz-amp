@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import os,sys,math
 import datetime as dt
+import platform
 
 # when we run from Notepad++, the working directory is wrong - fix it here
 currentPath = os.path.dirname(os.path.abspath(__file__))
@@ -74,6 +75,11 @@ class SampleDisplayer:
 		self.lastLine = None
 		self.samples = []
 		self.startTimestamp = dt.datetime.utcnow()
+		if platform.system == "Windows":
+			self.serialPortName = "COM7"
+		else:
+			self.serialPortName = "/dev/ttyACM0"
+		self.module.startRunning(self.serialPortName)
 
 	def handleCloseButton(self):
 		self.stopRunning()

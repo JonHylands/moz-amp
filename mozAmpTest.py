@@ -4,6 +4,7 @@
 import os,sys
 import serial
 import time
+import platform
 
 # when we run from Notepad++, the working directory is wrong - fix it here
 currentPath = os.path.dirname(os.path.abspath(__file__))
@@ -82,8 +83,10 @@ def ProcessPacketFromSerial(serialPort):
 
 print 'MozAmpTest'
 
-# serialPort = serial.Serial(port='/dev/ttyACM0', baudrate=1000000, timeout=1)
-serialPort = serial.Serial(port='COM7', baudrate=1000000, timeout=1)
+if platform.system() == "Linux":
+	self.serialPort = serial.Serial(port='/dev/ttyACM0', baudrate=1000000, timeout=1)
+else
+	self.serialPort = serial.Serial(port='COM7', baudrate=1000000, timeout=1)
 
 # commandBytes = bytearray.fromhex("ff ff 01 02 01 FB") #SET_ID
 # commandBytes = bytearray.fromhex("ff ff 01 02 02 FA") #START_ASYNC
