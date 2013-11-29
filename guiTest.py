@@ -64,9 +64,14 @@ class SampleDisplayer:
 		self.disconnectBatteryButton = Button(self.frameWidget, text="Disconnect", command=self.disconnectBattery)
 		self.disconnectBatteryButton.pack(side=TOP, fill=X)
 
+		if platform.system == "Windows":
+			self.serialPortName = "COM7"
+		else:
+			self.serialPortName = "/dev/ttyACM0"
 		self.drawScaleCanvas()
 		self.drawInitialMainCanvas()
 		self.xPosition = 0
+		self.module.startRunning(self.serialPortName)
 		sample = self.module.getSample()
 		current = sample.getCurrent()
 		self.yPosition = ZERO_LINE - (current / SCALE_FACTOR)
@@ -75,11 +80,6 @@ class SampleDisplayer:
 		self.lastLine = None
 		self.samples = []
 		self.startTimestamp = dt.datetime.utcnow()
-		if platform.system == "Windows":
-			self.serialPortName = "COM7"
-		else:
-			self.serialPortName = "/dev/ttyACM0"
-		self.module.startRunning(self.serialPortName)
 
 	def handleCloseButton(self):
 		self.stopRunning()

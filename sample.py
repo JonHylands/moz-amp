@@ -123,10 +123,10 @@ class CurrentModule:
 							yield 'COM' + str(i + 1)
 					except serial.SerialException:
 							pass
-    else:
-        # unix/linux/mac
-        for port in list_ports.comports():
-            yield port[0]
+		else:
+			# unix/linux/mac
+			for port in list_ports.comports():
+				yield port[0]
 
 	def connectBattery(self):
 		commandBytes = bytearray.fromhex("ff ff 01 02 06 F6") #TURN_ON_BATTERY

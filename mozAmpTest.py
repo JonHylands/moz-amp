@@ -84,9 +84,9 @@ def ProcessPacketFromSerial(serialPort):
 print 'MozAmpTest'
 
 if platform.system() == "Linux":
-	self.serialPort = serial.Serial(port='/dev/ttyACM0', baudrate=1000000, timeout=1)
-else
-	self.serialPort = serial.Serial(port='COM7', baudrate=1000000, timeout=1)
+	serialPort = serial.Serial(port='/dev/ttyACM0', baudrate=1000000, timeout=1)
+else:
+	serialPort = serial.Serial(port='COM7', baudrate=1000000, timeout=1)
 
 # commandBytes = bytearray.fromhex("ff ff 01 02 01 FB") #SET_ID
 # commandBytes = bytearray.fromhex("ff ff 01 02 02 FA") #START_ASYNC
