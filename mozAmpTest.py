@@ -93,7 +93,8 @@ else:
 # commandBytes = bytearray.fromhex("ff ff 01 02 03 F9") #STOP_ASYNC
 # commandBytes = bytearray.fromhex("ff ff 01 02 05 F7") #TURN_OFF_BATTERY
 # commandBytes = bytearray.fromhex("ff ff 01 02 06 F6") #TURN_ON_BATTERY
-commandBytes = bytearray.fromhex("ff ff 01 02 07 F5") #SEND_SAMPLE
+# commandBytes = bytearray.fromhex("ff ff 01 02 07 F5") #SEND_SAMPLE
+commandBytes = bytearray.fromhex("ff ff 01 02 0A F2") #GET_RAW_SAMPLE
 
 serialPort.flushInput()
 
