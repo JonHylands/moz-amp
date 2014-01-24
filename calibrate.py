@@ -7,44 +7,6 @@ import time
 import platform
 import struct
 
-# when we run from Notepad++, the working directory is wrong - fix it here
-currentPath = os.path.dirname(os.path.abspath(__file__))
-os.chdir(currentPath)
-
-from Tkinter import *
-
-
-def ProcessPacket(packetBytes):
-	packetLength = len(packetBytes)
-#	if packetLength != 86:
-#		print 'Packet is not 86 bytes long - {} bytes'.format(packetLength)
-#		return
-
-	global PacketCount
-	global CurrentTotal
-	global MinCurrent
-	global MaxCurrent
-
-	dataPortion = packetBytes[5:packetLength-1]
-	dataCount = len(dataPortion) / 8
-	for index in range(0, dataCount):
-		startIndex = index * 8
-		endIndex = startIndex + 8
-		sampleBytes = dataPortion[startIndex:endIndex]
-		current = ord(sampleBytes[0]) + (ord(sampleBytes[1]) * 256)
-		if (current > 32767):
-			current = (65536 - current) * -1;
-		voltage = ord(sampleBytes[2]) + (ord(sampleBytes[3]) * 256)
-		msCounter = ord(sampleBytes[4]) + (ord(sampleBytes[5]) * 256) + (ord(sampleBytes[6]) * 65536) + (ord(sampleBytes[7]) * 16777216)
-		print 'Sample %(index)d  - current: %(current)d voltage: %(voltage)d msCounter: %(counter)d' \
-			% {"index": index, "current": current, "voltage": voltage, "counter": msCounter}
-		PacketCount = PacketCount + 1
-		CurrentTotal = CurrentTotal + current
-		if current < MinCurrent:
-			MinCurrent = current
-		if current > MaxCurrent:
-			MaxCurrent = current
-
 print 'Mozilla Ammeter Calibration'
 
 print ''
