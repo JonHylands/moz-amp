@@ -64,7 +64,7 @@ class SampleDisplayer:
 		self.disconnectBatteryButton = Button(self.frameWidget, text="Disconnect", command=self.disconnectBattery)
 		self.disconnectBatteryButton.pack(side=TOP, fill=X)
 
-		if platform.system == "Windows":
+		if platform.system() == "Windows":
 			self.serialPortName = "COM7"
 		else:
 			self.serialPortName = "/dev/ttyACM0"
