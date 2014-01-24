@@ -115,6 +115,18 @@ print 'Average: %(average)d' % {"average": average}
 print 'Min:     %(min)d' % {"min": MinCurrent}
 print 'Max:     %(max)d' % {"max": MaxCurrent}
 
+commandBytes = bytearray.fromhex("ff ff 01 02 0B F1") #GET_VERSION
+serialPort.write(commandBytes)
+serialPort.flush()
+bytes = serialPort.read(7)
+if len(bytes) == 0:
+	version = 0.1
+else:
+	version = ord(bytes[5]) / 10.0
+
+print ''
+print 'Ammeter Version: ', version
+print ''
 
 #f = open('data.txt', 'wb')
 #f.write(bytes)
