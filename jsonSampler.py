@@ -3,7 +3,7 @@ import json
 
 def main():
     powerLog = []
-    serialPortName = "/dev/cu.usbmodem1451"
+    serialPortName = "/dev/ttyACM0"
     module = CurrentModule()
     module.startRunning(serialPortName)
     try:
