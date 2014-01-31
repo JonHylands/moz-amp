@@ -1,11 +1,23 @@
 from sample import *
 import json
+import signal
+import time
+
+def stopJsonSampler(signum, frame):
+    raise KeyboardInterrupt, "Signal handler"
 
 def main():
+    signal.signal(signal.SIGINT, stopJsonSampler)
     powerLog = []
     serialPortName = "/dev/ttyACM0"
     module = CurrentModule()
     module.startRunning(serialPortName)
+
+    sampleTimeBeforeEpochOffset = time.time()
+    sample = module.getSample()
+    sampleTimeAfterEpochOffset = time.time()
+    sampleTimeEpochOffset = (sampleTimeAfterEpochOffset + sampleTimeBeforeEpochOffset) * 1000.0 / 2.0 - sample.msCounter;
+
     try:
         while True:
             sample = module.getSample()
@@ -15,7 +27,10 @@ def main():
             sampleObj['time'] = sample.msCounter;
             powerLog.append(sampleObj)
     except KeyboardInterrupt:
-        print json.dumps(powerLog, sort_keys=True,
+        powerProfile = {}
+        powerProfile['sampleTimeEpochOffset'] = sampleTimeEpochOffset
+        powerProfile['samples'] = powerLog
+        print json.dumps(powerProfile, sort_keys=True,
                    indent=4, separators=(',', ': '))
 
 if __name__ == '__main__':
