@@ -26,6 +26,7 @@ def main():
             sampleObj = {}
             sampleObj['current'] = current;
             sampleObj['time'] = sample.msCounter;
+            sampleObj['pcTime'] = int(time.time() * 1000)
             powerLog.append(sampleObj)
     except KeyboardInterrupt:
         powerProfile = {}
