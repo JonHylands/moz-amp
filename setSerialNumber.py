@@ -39,3 +39,9 @@ serialPort.flush()
 
 serialPort.close()
 print "Serial Number sent."
+
+file = open('lastSerialNumber', 'w')
+file.write(str(serialNumber))
+file.write('\n')
+file.close()
+
