@@ -10,8 +10,6 @@ import platform
 currentPath = os.path.dirname(os.path.abspath(__file__))
 os.chdir(currentPath)
 
-from Tkinter import *
-
 
 def ProcessPacket(packetBytes):
 	packetLength = len(packetBytes)
