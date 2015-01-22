@@ -112,6 +112,7 @@ class SampleDisplayer:
 		if sample is None:
 			print 'Sync error'
 			return
+		self.samples.append(sample)
 
 #			done = False
 #			count = 0
@@ -126,11 +127,19 @@ class SampleDisplayer:
 #				print 'Unrecoverable sync error'
 #				return
 
-		millivolts = sample.getVoltage()
-		voltage = millivolts / 1000.0
+		sameplsToAverage = 10
+		sampleCount = len(self.samples)
+		if sampleCount > sameplsToAverage:
+			voltages = 0
+			for subSample in self.samples[sampleCount - sameplsToAverage:sampleCount]:
+				millivolts = subSample.getVoltage()
+				voltages = voltages + (millivolts / 1000.0)
+			voltage = voltages / sameplsToAverage
+		else:
+			millivolts = sample.getVoltage()
+			voltage = millivolts / 1000.0
 		voltageString = "Voltage\n{:3.2f} V".format(voltage)
 		self.voltageString.set(voltageString)
-		self.samples.append(sample)
 		current = sample.getCurrent() / 10.0
 		newYPosition = ZERO_LINE - (current / SCALE_FACTOR)
 
