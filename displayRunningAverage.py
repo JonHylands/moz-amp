@@ -18,8 +18,10 @@ module.startRunning(serialPortName)
 
 startTime = int(round(time.time() * 1000))
 lastPrintTime = startTime
-sampleInterval = 60000
+sampleInterval = 1000
+hourFactor = 3600000 / sampleInterval
 samples = []
+milliampHours = 0
 while True:
     sample = module.getSample()
     samples.append(sample)
@@ -34,10 +36,11 @@ while True:
             totalVoltage += (sample.getVoltage() / 1000.0) # sample is in millivolts
         current = totalCurrent / sampleCount
         voltage = totalVoltage / sampleCount
+        milliampHours += (current / hourFactor)
         if voltage < 3.2:
             print('\a\aLow Voltage Alert!')
         samples = []
         lastPrintTime = int(round(time.time() * 1000))
         elapsedSeconds = int((lastPrintTime - startTime) / 1000)
         elapsedTime = time.strftime("%H:%M:%S", time.gmtime(elapsedSeconds))
-        print '{averageCurrent:4.1f} mA - {averageVoltage:1.2f} V : {elapsed:s}'.format(averageCurrent=current, averageVoltage=voltage, elapsed=elapsedTime)
+        print '{:4.1f} mA - {:1.2f} V : {:s} ({:3.1f} mAh)'.format(current, voltage, elapsedTime, milliampHours)
